@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>COVID-19 on Reddit | DataSC</title>
+   <link rel="stylesheet" href="main.css">
+   <script src="dashboard.js" defer></script>
+</head>
+
+<body>
+   <header class="topbar">
+      <span>USC Data Science Club</span>
+      <span>Fall 2026</span>
+   </header>
+
+   <main>
+      <p class="eyebrow">DEC 2019 – DEC 2022 · EXPLORATORY DATA</p>
+      <h1>COVID-19 on Reddit</h1>
+      <p class="intro">Explore how often GoEmotions flagged different emotions
+         in the posts we collected.</p>
+
+      <p id="status" role="status">Loading timeline…</p>
+
+      <section id="overview" class="card" hidden>
+         <div class="toolbar">
+            <div>
+               <h2>Emotion timeline</h2>
+               <p>Hover for values. Click a month to see its breakdown.</p>
+            </div>
+            <label>Chart view
+               <select id="emotion-select"></select>
+            </label>
+         </div>
+
+         <p class="axis-title">% of scored posts flagged</p>
+         <div class="chart-wrap">
+            <svg id="timeline" viewBox="0 0 960 340" aria-label="Monthly emotion timeline"></svg>
+         </div>
+         <div id="legend" class="legend"></div>
+         <p id="chart-readout" class="readout"></p>
+
+         <div class="toolbar month-control">
+            <label>Choose a month
+               <select id="month-select"></select>
+            </label>
+            <button id="open-month" type="button">View month</button>
+         </div>
+      </section>
+
+      <section id="details" class="card" hidden>
+         <button id="back" type="button">← Back to timeline</button>
+         <h2 id="month-heading" tabindex="-1"></h2>
+         <p id="month-count"></p>
+         <p>Ranked by share of scored posts flagged.</p>
+
+         <div class="table-wrap">
+            <table>
+               <thead>
+                  <tr>
+                     <th scope="col">Category</th>
+                     <th scope="col">Flagged posts</th>
+                     <th scope="col">Share of posts</th>
+                  </tr>
+               </thead>
+               <tbody id="emotion-rows"></tbody>
+            </table>
+         </div>
+      </section>
+
+      <footer>
+         Source: unfiltered project dataset. A post is flagged for a category when
+         its model score is at least 0.5. One post can be flagged for multiple
+         categories, so percentages do not have to add up to 100%.
+      </footer>
+   </main>
+</body>
+
+</html>

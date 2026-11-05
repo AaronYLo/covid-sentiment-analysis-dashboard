@@ -1,0 +1,216 @@
+@font-face {
+   font-family: "Saira Stencil";
+   src: url("fonts/Saira_Stencil/SairaStencil-VariableFont_wdth,wght.ttf") format("truetype");
+   font-display: swap;
+}
+
+@font-face {
+   font-family: "Montserrat";
+   src: url("fonts/Montserrat/Montserrat-VariableFont_wght.ttf") format("truetype");
+   font-weight: 100 900;
+   font-display: swap;
+}
+
+* {
+   box-sizing: border-box;
+}
+
+[hidden] {
+   display: none !important;
+}
+
+body {
+   margin: 0;
+   background: #f5f4f0;
+   color: #202b38;
+   font-family: "Montserrat", Arial, sans-serif;
+   line-height: 1.55;
+}
+
+.topbar {
+   display: flex;
+   justify-content: space-between;
+   gap: 1rem;
+   padding: 1rem max(1rem, calc((100% - 1060px) / 2));
+   background: #192638;
+   color: white;
+   font-size: .85rem;
+}
+
+main {
+   max-width: 1100px;
+   margin: auto;
+   padding: 2rem 1rem;
+}
+
+h1,
+h2 {
+   font-family: "Saira Stencil", Arial, sans-serif;
+   font-weight: normal;
+   line-height: 1.1;
+}
+
+h1 {
+   margin: .3rem 0;
+   font-size: clamp(2.2rem, 6vw, 4.2rem);
+}
+
+h2 {
+   margin: 0 0 .4rem;
+   font-size: 1.9rem;
+}
+
+.eyebrow {
+   font-size: .78rem;
+   font-weight: 700;
+   letter-spacing: .12em;
+}
+
+.intro,
+footer,
+.toolbar p,
+#month-count {
+   color: #536070;
+}
+
+.intro {
+   margin-bottom: 1.5rem;
+}
+
+.card {
+   padding: clamp(1rem, 3vw, 1.75rem);
+   background: white;
+   border: 1px solid #dde1e6;
+   border-radius: 14px;
+}
+
+.toolbar {
+   display: flex;
+   justify-content: space-between;
+   align-items: end;
+   flex-wrap: wrap;
+   gap: 1rem;
+}
+
+.toolbar p {
+   margin: 0;
+}
+
+label {
+   display: grid;
+   gap: .3rem;
+   font-size: .85rem;
+   font-weight: 650;
+}
+
+button,
+select {
+   font: inherit;
+   border: 1px solid #aeb8c4;
+   border-radius: 7px;
+   padding: .5rem .7rem;
+   background: white;
+   color: inherit;
+}
+
+button {
+   cursor: pointer;
+}
+
+button:hover {
+   background: #eaf0f6;
+}
+
+:focus-visible {
+   outline: 3px solid #1764a3;
+   outline-offset: 3px;
+}
+
+.axis-title {
+   margin: 1.25rem 0 .2rem;
+   font-size: .8rem;
+   font-weight: 700;
+}
+
+.chart-wrap,
+.table-wrap {
+   overflow-x: auto;
+}
+
+#timeline {
+   display: block;
+   width: 100%;
+   min-width: 560px;
+}
+
+#timeline text {
+   font-size: 13px;
+   fill: #536070;
+}
+
+.legend {
+   display: flex;
+   flex-wrap: wrap;
+   gap: .4rem 1.25rem;
+}
+
+.legend span {
+   display: inline-flex;
+   align-items: center;
+   gap: .4rem;
+}
+
+.swatch {
+   width: .75rem;
+   height: .75rem;
+   border-radius: 50%;
+}
+
+.readout {
+   min-height: 3.4rem;
+   background: #f1f5f9;
+   border-radius: 8px;
+   padding: .65rem .8rem;
+   font-size: .9rem;
+}
+
+.month-control {
+   justify-content: flex-start;
+}
+
+#back {
+   margin-bottom: 1rem;
+}
+
+table {
+   width: 100%;
+   min-width: 400px;
+   border-collapse: collapse;
+}
+
+th,
+td {
+   padding: .55rem .65rem;
+   text-align: left;
+   border-bottom: 1px solid #e5e9ed;
+}
+
+thead {
+   background: #f1f5f9;
+}
+
+.share-cell {
+   min-width: 140px;
+}
+
+.share-bar {
+   height: 5px;
+   margin-top: .25rem;
+   border-radius: 4px;
+   background: #1764a3;
+}
+
+footer {
+   margin-top: 1.2rem;
+   font-size: .82rem;
+}
