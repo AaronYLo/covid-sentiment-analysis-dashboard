@@ -127,7 +127,62 @@ function drawChart() {
          values.join(" · ");
    }
 
-   // Transparent targets make the whole vertical slice clickable.
+   // Leave the captions empty while testing the box.
+   const monthEvents = {};
+   const eventBox = svg("foreignObject", {
+      visibility: "hidden",
+      "pointer-events": "none",
+      overflow: "hidden",
+      height: bottom - top,
+      "aria-hidden": "true"
+   });
+
+   const eventText = document.createElement("div");
+   Object.assign(eventText.style, {
+      boxSizing: "border-box",
+      padding: "10px",
+      background: "#fff",
+      border: "1px solid #a7b4c3",
+      borderRadius: "8px",
+      color: "#253247",
+      font: "14px/1.4 system-ui, sans-serif",
+      overflowWrap: "anywhere"
+   });
+   eventBox.append(eventText);
+
+   function showEventBox(i, event) {
+      const matrix = chart.getScreenCTM();
+      if (!matrix) return;
+
+      const cursor = new DOMPoint(event.clientX, event.clientY)
+         .matrixTransform(matrix.inverse());
+
+      // When several emotions are shown, anchor to the closest point.
+      const pointX = x(i);
+      const pointY = keys.map(key => y(rows[i][`${key}_pct`]))
+         .reduce((nearest, current) =>
+            Math.abs(current - cursor.y) < Math.abs(nearest - cursor.y)
+               ? current : nearest
+         );
+
+      const caption = monthEvents[rows[i].month] ?? "";
+      const width = Math.min(right - left, Math.max(4 * step, caption ? 220 : 0));
+      eventText.textContent = caption;
+      eventText.style.minHeight = `${Math.min(3 * step, bottom - top)}px`;
+      eventBox.setAttribute("width", width);
+
+      const height = Math.min(bottom - top, eventText.offsetHeight);
+      const gap = 10;
+      const preferredX = pointX - gap - width;
+      const boxX = preferredX >= left ? preferredX : pointX + gap;
+
+      eventBox.setAttribute("x", Math.max(left, Math.min(boxX, right - width)));
+      eventBox.setAttribute("y", Math.max(top, Math.min(pointY - height / 2, bottom - height)));
+      eventBox.setAttribute("height", height);
+      eventBox.setAttribute("visibility", "visible");
+   }
+
+   // Transparent targets keep the whole vertical slice clickable.
    rows.forEach((row, i) => {
       const start = i === 0 ? left : x(i) - step / 2;
       const end = i === rows.length - 1 ? right : x(i) + step / 2;
@@ -135,11 +190,20 @@ function drawChart() {
          x: start, y: top, width: Math.max(1, end - start),
          height: bottom - top, fill: "transparent", cursor: "pointer"
       });
-      target.addEventListener("pointerenter", () => showReadout(i));
+
+      target.addEventListener("pointerenter", event => {
+         showReadout(i);
+         showEventBox(i, event);
+      });
+      target.addEventListener("pointermove", event => showEventBox(i, event));
       target.addEventListener("click", () => openMonth(i));
    });
 
-   chart.onpointerleave = () => showReadout(selectedIndex);
+   chart.append(eventBox);
+   chart.onpointerleave = () => {
+      eventBox.setAttribute("visibility", "hidden");
+      showReadout(selectedIndex);
+   };
    showReadout(selectedIndex);
 }
 
