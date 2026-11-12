@@ -272,49 +272,98 @@ function openMonth(index) {
    $("month-heading").focus();
 }
 
-async function init() {
-   try {
-      const response = await fetch("./timeline_metrics_unfiltered.json");
-      if (!response.ok) throw new Error(`Couldn't load JSON (${response.status}).`);
-      rows = await response.json();
-      if (!Array.isArray(rows) || !rows.length) throw new Error("The JSON has no monthly rows.");
-      rows.sort((a, b) => a.month.localeCompare(b.month));
+const topicFiles = {
+   all: "./timeline_metrics_unfiltered.json",
+   healthcare: "./topic_healthcare.json",
+   lockdown: "./topic_lockdown.json",
+   service_industry: "./topic_service_industry.json"
+};
 
-      categories = Object.keys(rows[0])
-         .filter(key => key.endsWith("_pct"))
-         .map(key => key.slice(0, -4));
+async function loadTopic(topic) {
+   const path = topicFiles[topic];
+   const response = await fetch(path);
+   if (!response.ok) throw new Error(`Could not load ${path} (${response.status}).`);
 
-      emotionSelect.add(new Option("Featured: curiosity, annoyance, fear", "featured"));
-      for (const [name, keys] of Object.entries(groups)) {
-         const group = document.createElement("optgroup");
-         group.label = name;
-         for (const key of keys) {
-            if (categories.includes(key)) group.append(new Option(label(key), key));
-         }
-         emotionSelect.append(group);
-      }
-
-      rows.forEach((row, i) => monthSelect.add(new Option(monthLabel(row.month), i)));
-      emotionSelect.addEventListener("change", drawChart);
-      monthSelect.addEventListener("change", () => {
-         selectedIndex = Number(monthSelect.value);
-         drawChart();
-      });
-      $("open-month").addEventListener("click", () => openMonth(Number(monthSelect.value)));
-      $("back").addEventListener("click", () => {
-         $("details").hidden = true;
-         $("overview").hidden = false;
-         drawChart();
-         monthSelect.focus();
-      });
-
-      drawChart();
-      $("overview").hidden = false;
-      $("status").hidden = true;
-   } catch (error) {
-      $("status").textContent =
-         `${error.message} Put the JSON beside index.html and open the site through localhost.`;
+   const nextRows = await response.json();
+   if (!Array.isArray(nextRows) || !nextRows.length) {
+      throw new Error(`${path} has no monthly rows.`);
    }
+   nextRows.sort((a, b) => a.month.localeCompare(b.month));
+
+   const previousMonth = rows[selectedIndex]?.month;
+   const previousEmotion = emotionSelect.value;
+
+   rows = nextRows;
+   categories = Object.keys(rows[0])
+      .filter(key => key.endsWith("_pct"))
+      .map(key => key.slice(0, -4));
+
+   emotionSelect.replaceChildren(
+      new Option("Featured: curiosity, annoyance, fear", "featured")
+   );
+   for (const [name, keys] of Object.entries(groups)) {
+      const group = document.createElement("optgroup");
+      group.label = name;
+      for (const key of keys) {
+         if (categories.includes(key)) group.append(new Option(label(key), key));
+      }
+      if (group.children.length) emotionSelect.append(group);
+   }
+   emotionSelect.value = categories.includes(previousEmotion)
+      ? previousEmotion : "featured";
+
+   monthSelect.replaceChildren();
+   rows.forEach((row, i) => monthSelect.add(new Option(monthLabel(row.month), i)));
+   selectedIndex = Math.max(0, rows.findIndex(row => row.month === previousMonth));
+   monthSelect.value = String(selectedIndex);
+
+   drawChart();
+}
+
+async function init() {
+   const topicSelect = $("topic-select");
+   const status = $("status");
+   let activeTopic = "all";
+
+   try {
+      await loadTopic(activeTopic);
+      $("overview").hidden = false;
+      status.hidden = true;
+   } catch (error) {
+      status.textContent = error.message;
+      return;
+   }
+
+   topicSelect.addEventListener("change", async () => {
+      const nextTopic = topicSelect.value;
+      topicSelect.disabled = true;
+      status.hidden = false;
+      status.textContent = "Loading topic…";
+
+      try {
+         await loadTopic(nextTopic);
+         activeTopic = nextTopic;
+         status.hidden = true;
+      } catch (error) {
+         topicSelect.value = activeTopic;
+         status.textContent = error.message;
+      } finally {
+         topicSelect.disabled = false;
+      }
+   });
+
+   emotionSelect.addEventListener("change", drawChart);
+   monthSelect.addEventListener("change", () => {
+      selectedIndex = Number(monthSelect.value);
+      drawChart();
+   });
+   $("open-month").addEventListener("click", () => openMonth(Number(monthSelect.value)));
+   $("back").addEventListener("click", () => {
+      $("details").hidden = true;
+      $("overview").hidden = false;
+      drawChart();
+      monthSelect.focus();
+   });
 }
 
 init();

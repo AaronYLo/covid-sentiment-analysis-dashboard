@@ -214,3 +214,25 @@ footer {
    margin-top: 1.2rem;
    font-size: .82rem;
 }
+
+.chart-controls {
+   display: grid;
+   gap: 8px;
+   max-width: 100%;
+}
+
+.chart-controls .topic-control {
+   display: grid;
+   grid-template-columns: auto minmax(0, 1fr);
+   align-items: center;
+   gap: 12px;
+}
+
+.chart-controls select {
+   width: 100%;
+   min-width: 0;
+}
+
+.chart-controls .topic-control select {
+   margin-top: 0;
+}

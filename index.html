@@ -29,9 +29,21 @@
                <h2>Emotion timeline</h2>
                <p>Hover for values. Click a month to see its breakdown.</p>
             </div>
-            <label>Chart view
-               <select id="emotion-select"></select>
-            </label>
+            <div class="chart-controls">
+               <label class="topic-control">
+                  <span>Topic selected:</span>
+                  <select id="topic-select">
+                     <option value="all" selected>General</option>
+                     <option value="healthcare">Healthcare</option>
+                     <option value="lockdown">Lockdown</option>
+                     <option value="service_industry">Service industry</option>
+                  </select>
+               </label>
+
+               <label>Chart view
+                  <select id="emotion-select"></select>
+               </label>
+            </div>
          </div>
 
          <p class="axis-title">% of scored posts flagged</p>
