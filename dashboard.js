@@ -127,8 +127,9 @@ function drawChart() {
          values.join(" · ");
    }
 
-   // Leave the captions empty while testing the box.
+   // Add event captions here later, using YYYY-MM as the key.
    const monthEvents = {};
+
    const eventBox = svg("foreignObject", {
       visibility: "hidden",
       "pointer-events": "none",
@@ -142,60 +143,51 @@ function drawChart() {
       boxSizing: "border-box",
       padding: "10px",
       background: "#fff",
-      border: "1px solid #a7b4c3",
-      borderRadius: "8px",
+      border: "2px solid #111",
       color: "#253247",
       font: "14px/1.4 system-ui, sans-serif",
+      textAlign: "center",
       overflowWrap: "anywhere"
    });
    eventBox.append(eventText);
 
-   function showEventBox(i, event) {
-      const matrix = chart.getScreenCTM();
-      if (!matrix) return;
-
-      const cursor = new DOMPoint(event.clientX, event.clientY)
-         .matrixTransform(matrix.inverse());
-
-      // When several emotions are shown, anchor to the closest point.
-      const pointX = x(i);
-      const pointY = keys.map(key => y(rows[i][`${key}_pct`]))
-         .reduce((nearest, current) =>
-            Math.abs(current - cursor.y) < Math.abs(nearest - cursor.y)
-               ? current : nearest
-         );
-
+   function showEventBox(i) {
       const caption = monthEvents[rows[i].month] ?? "";
-      const width = Math.min(right - left, Math.max(4 * step, caption ? 220 : 0));
+      const plotWidth = right - left;
+      const plotHeight = bottom - top;
+      const width = Math.min(plotWidth, Math.max(4 * step, caption ? 220 : 0));
+
       eventText.textContent = caption;
-      eventText.style.minHeight = `${Math.min(3 * step, bottom - top)}px`;
+      eventText.style.minHeight = `${Math.min(3 * step, plotHeight)}px`;
       eventBox.setAttribute("width", width);
 
-      const height = Math.min(bottom - top, eventText.offsetHeight);
-      const gap = 10;
-      const preferredX = pointX - gap - width;
-      const boxX = preferredX >= left ? preferredX : pointX + gap;
+      const gap = 8;
+      const leftOfGuide = x(i) - gap - width;
+      const boxX = leftOfGuide >= left ? leftOfGuide : x(i) + gap;
 
       eventBox.setAttribute("x", Math.max(left, Math.min(boxX, right - width)));
-      eventBox.setAttribute("y", Math.max(top, Math.min(pointY - height / 2, bottom - height)));
-      eventBox.setAttribute("height", height);
+      eventBox.setAttribute("y", top);
+      eventBox.setAttribute("height", Math.min(plotHeight, eventText.offsetHeight));
       eventBox.setAttribute("visibility", "visible");
    }
 
-   // Transparent targets keep the whole vertical slice clickable.
+   // Keep the whole month slice hoverable and clickable.
    rows.forEach((row, i) => {
       const start = i === 0 ? left : x(i) - step / 2;
       const end = i === rows.length - 1 ? right : x(i) + step / 2;
       const target = svg("rect", {
-         x: start, y: top, width: Math.max(1, end - start),
-         height: bottom - top, fill: "transparent", cursor: "pointer"
+         x: start,
+         y: top,
+         width: Math.max(1, end - start),
+         height: bottom - top,
+         fill: "transparent",
+         cursor: "pointer"
       });
 
-      target.addEventListener("pointerenter", event => {
+      target.addEventListener("pointerenter", () => {
          showReadout(i);
-         showEventBox(i, event);
+         showEventBox(i);
       });
-      target.addEventListener("pointermove", event => showEventBox(i, event));
       target.addEventListener("click", () => openMonth(i));
    });
 
