@@ -87,7 +87,7 @@ footer,
 .toolbar {
    display: flex;
    justify-content: space-between;
-   align-items: end;
+   align-items: flex-start;
    flex-wrap: wrap;
    gap: 1rem;
 }
