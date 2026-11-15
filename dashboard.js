@@ -12,7 +12,7 @@ const groups = {
    "Sadness & regret": ["sadness", "grief", "disappointment", "remorse", "embarrassment"],
    "Fear & anxiety": ["fear", "nervousness"],
    "Warmth & appreciation": ["love", "caring", "admiration", "approval", "gratitude"],
-   "Other categories": ["desire", "neutral"]
+   "Other categories": ["desire"]
 };
 
 const $ = id => document.getElementById(id);
@@ -295,7 +295,7 @@ async function loadTopic(topic) {
 
    rows = nextRows;
    categories = Object.keys(rows[0])
-      .filter(key => key.endsWith("_pct"))
+      .filter(key => key.endsWith("_pct") && key !== "neutral_pct")
       .map(key => key.slice(0, -4));
 
    emotionSelect.replaceChildren(
