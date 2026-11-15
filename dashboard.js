@@ -37,7 +37,8 @@ function monthLabel(month) {
 }
 
 function color(key) {
-   return colors[key] || "#247269";
+   const hue = (categories.indexOf(key) * 137.5) % 360;
+   return colors[key] || `hsl(${hue}, 65%, 38%)`;
 }
 
 // Create an SVG shape or text node inside the chart.
@@ -52,9 +53,9 @@ function svg(tag, attributes = {}, content = "") {
 }
 
 function drawChart() {
-   const keys = emotionSelect.value === "featured"
-      ? featured
-      : [emotionSelect.value];
+   const selected = [...emotionSelect.selectedOptions].map(option => option.value);
+   const custom = selected.filter(key => key !== "featured");
+   const keys = custom.length ? custom : featured;
 
    const left = 54, right = 935, top = 20, bottom = 295;
    const step = (right - left) / Math.max(rows.length - 1, 1);
@@ -291,8 +292,9 @@ async function loadTopic(topic) {
    nextRows.sort((a, b) => a.month.localeCompare(b.month));
 
    const previousMonth = rows[selectedIndex]?.month;
-   const previousEmotion = emotionSelect.value;
-
+   const previousEmotions = new Set(
+      [...emotionSelect.selectedOptions].map(option => option.value)
+   );
    rows = nextRows;
    categories = Object.keys(rows[0])
       .filter(key => key.endsWith("_pct") && key !== "neutral_pct")
@@ -309,8 +311,12 @@ async function loadTopic(topic) {
       }
       if (group.children.length) emotionSelect.append(group);
    }
-   emotionSelect.value = categories.includes(previousEmotion)
-      ? previousEmotion : "featured";
+   for (const option of emotionSelect.options) {
+      option.selected = previousEmotions.has(option.value);
+   }
+   if (!emotionSelect.selectedOptions.length) {
+      emotionSelect.value = "featured";
+   }
 
    monthSelect.replaceChildren();
    rows.forEach((row, i) => monthSelect.add(new Option(monthLabel(row.month), i)));
